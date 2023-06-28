@@ -1,7 +1,6 @@
 from django.contrib.auth import update_session_auth_hash
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import F, Sum
 from rest_framework import viewsets, status, mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -9,8 +8,9 @@ from rest_framework.decorators import action
 from djoser.serializers import SetPasswordSerializer
 from users.models import User, Subscription
 from recipes.models import (Tag, Recipe, Favorite,
-                            ShoppingCart, IngredientInRecipe,
+                            ShoppingCart,
                             Ingredient)
+from recipe.models import get_info_ingredient_in_recipe
 from .serializers import (IngrSerializer, TagSerializer,
                           RecipeGetSerializer, FavoriteSerializer,
                           RecipeCreateSerializer, RecipeMiniSerializer,
@@ -113,7 +113,7 @@ class ModernUserViewSet(mixins.CreateModelMixin,
         )
 
 
-class IngrViewSet(viewsets.ReadOnlyModelViewSet):
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngrSerializer
     filter_backends = (DjangoFilterBackend)
@@ -175,12 +175,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def download_shopping_cart(self, request):
         user = request.user
-        ingredients = IngredientInRecipe.objects.filter(
-            recipe__shopping_cart__user=user).values(
-            name=F('ingredient__name'),
-            metric=F('ingredient__metric')).annotate(
-            amount=Sum('amount')
-        )
+        ingredients = get_info_ingredient_in_recipe(user)
         data = []
         for ingredient in ingredients:
             data.append(

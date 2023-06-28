@@ -284,6 +284,20 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                     'error': 'В рецепте ингрилиенты повторяться не могут'
                 }
             )
+        tags = data['tags']
+        if not tags:
+            raise serializers.ValidationError(
+                {
+                    'error': 'Нужен хотя бы один тэг для рецепта!'
+                }
+            )
+        for tag_name in tags:
+            if not Tag.objects.filter(name=tag_name).exists():
+                raise serializers.ValidationError(
+                    {
+                        'error': f'Тэга {tag_name} не существует!'
+                    }
+                )
         return data
 
     def create(self, validated_data):

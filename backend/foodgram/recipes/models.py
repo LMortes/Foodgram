@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, RegexValidator
 from users.models import User
+from django.db.models import F, Sum
 
 
 class Ingredient(models.Model):
@@ -75,7 +76,7 @@ class Recipe(models.Model):
         Tag,
         related_name='recipes'
     )
-    cooking_time = models.IntegerField(
+    cooking_time = models.PositiveSmallIntegerField(
         'Время приготовления(мин.)',
         validators=[
             MinValueValidator(
@@ -108,7 +109,7 @@ class IngredientInRecipe(models.Model):
         on_delete=models.CASCADE,
         related_name='IngredientsInRecipe'
     )
-    amount = models.IntegerField(
+    amount = models.PositiveSmallIntegerField(
         'Кол-во ингридиентов в 1 рецепте',
         validators=[
             MinValueValidator(
@@ -120,6 +121,15 @@ class IngredientInRecipe(models.Model):
     class Meta:
         verbose_name = 'ингридиент в рецепте'
         verbose_name_plural = 'ингридиенты в рецепте'
+
+    def get_info_ingredient_in_recipe(user):
+        ingredients = IngredientInRecipe.objects.filter(
+            recipe__shopping_cart__user=user).values(
+            name=F('ingredient__name'),
+            metric=F('ingredient__metric')).annotate(
+            amount=Sum('amount')
+        )
+        return ingredients
 
     def __str__(self):
         return f'{self.ingredient.name} в рецепте {self.recipe.name}'
