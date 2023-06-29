@@ -1,21 +1,10 @@
-import base64
 from djoser.serializers import UserSerializer, UserCreateSerializer
-from django.core.files.base import ContentFile
 from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
+from .image_field_serializer import Base64ImageField
 from recipes.models import (Tag, Recipe, IngredientInRecipe,
                             ShoppingCart, Favorite, Ingredient)
 from users.models import User, Subscription
-
-
-class Base64ImageField(serializers.ImageField):
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')
-            ext = format.split('/')[-1]
-            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-
-        return super().to_internal_value(data)
 
 
 class UserProfileGetSerializer(UserSerializer):
@@ -130,13 +119,13 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         return value
 
 
-class IngrSerializer(serializers.ModelSerializer):
+class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
         fields = ('id', 'name', 'metric')
 
 
-class IngrInRecipeSerializer(serializers.ModelSerializer):
+class IngredientInRecipeSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all(),
         source='ingredient.id'
@@ -166,7 +155,7 @@ class RecipeGetSerializer(serializers.ModelSerializer):
     is_in_shopping_cart = serializers.SerializerMethodField()
     tags = TagSerializer(many=True, read_only=True)
     author = UserProfileGetSerializer()
-    ingredients = IngrInRecipeSerializer(
+    ingredients = IngredientInRecipeSerializer(
         source='IngredientsInRecipe',
         many=True,
         read_only=True
@@ -223,7 +212,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         many=True,
         queryset=Tag.objects.all()
     )
-    ingredients = IngrInRecipeSerializer(
+    ingredients = IngredientInRecipeSerializer(
         source='IngredientsInRecipe',
         many=True
     )
@@ -260,14 +249,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             )
         IngredientInRecipe.objects.bulk_create(ingredients_list)
 
-    def validate(self, data):
-        cooking_time = data.get('cooking_time')
-        if cooking_time <= 0:
-            raise serializers.ValidationError(
-                {
-                    'error': 'Время приготовления начинается от 1 минуты'
-                }
-            )
+    def validate_ingredients(self, data):
         ingredients_list = []
         ingredients_in_recipe = data.get('IngredientsInRecipe')
         for ingredient in ingredients_in_recipe:
@@ -281,9 +263,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         if len(ingredients_list) > len(set(ingredients_list)):
             raise serializers.ValidationError(
                 {
-                    'error': 'В рецепте ингрилиенты повторяться не могут'
+                    'error': 'В рецепте ингридиенты не могут повторяться'
                 }
             )
+
+    def validate_tags(self, data):
         tags = data['tags']
         if not tags:
             raise serializers.ValidationError(
@@ -298,6 +282,19 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                         'error': f'Тэга {tag_name} не существует!'
                     }
                 )
+
+    def validate(self, data):
+        cooking_time = data.get('cooking_time')
+        if cooking_time <= 0:
+            raise serializers.ValidationError(
+                {
+                    'error': 'Время приготовления должно быть больше 0'
+                }
+            )
+
+        self.validate_ingredients(data)
+        self.validate_tags(data)
+
         return data
 
     def create(self, validated_data):

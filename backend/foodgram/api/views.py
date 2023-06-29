@@ -10,8 +10,7 @@ from users.models import User, Subscription
 from recipes.models import (Tag, Recipe, Favorite,
                             ShoppingCart,
                             Ingredient)
-from recipe.models import get_info_ingredient_in_recipe
-from .serializers import (IngrSerializer, TagSerializer,
+from .serializers import (IngredientSerializer, TagSerializer,
                           RecipeGetSerializer, FavoriteSerializer,
                           RecipeCreateSerializer, RecipeMiniSerializer,
                           ShoppingCartSerializer, UserProfileGetSerializer,
@@ -19,7 +18,7 @@ from .serializers import (IngrSerializer, TagSerializer,
                           UserRecipesSerializer)
 from .permissions import IsAuthorOrAdminOrReadOnly
 from .pagination import CustomPagination
-from .filters import RecipeFilter, IngrFilter
+from .filters import RecipeFilter, IngredientFilter
 from .utils import create_and_delete
 
 
@@ -115,9 +114,9 @@ class ModernUserViewSet(mixins.CreateModelMixin,
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
-    serializer_class = IngrSerializer
+    serializer_class = IngredientSerializer
     filter_backends = (DjangoFilterBackend)
-    filterset_class = IngrFilter
+    filterset_class = IngredientFilter
     pagination_class = None
 
 
@@ -174,15 +173,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated]
     )
     def download_shopping_cart(self, request):
-        user = request.user
-        ingredients = get_info_ingredient_in_recipe(user)
-        data = []
-        for ingredient in ingredients:
-            data.append(
-                f'{ingredient["name"]} - '
-                f'{ingredient["amount"]} '
-                f'{ingredient["metric"]}'
-            )
+        data = get_info_ingredient_in_recipe(request.user)
         content = 'Список покупок:\n\n' + '\n'.join(data)
         filename = 'Shopping_cart.txt'
         request = HttpResponse(content, content_type='text/plain')

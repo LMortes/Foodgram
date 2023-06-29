@@ -1,7 +1,7 @@
 from django.db import models
+from django.db.models import F, Sum
 from django.core.validators import MinValueValidator, RegexValidator
 from users.models import User
-from django.db.models import F, Sum
 
 
 class Ingredient(models.Model):
@@ -129,7 +129,15 @@ class IngredientInRecipe(models.Model):
             metric=F('ingredient__metric')).annotate(
             amount=Sum('amount')
         )
-        return ingredients
+        data = []
+        for ingredient in ingredients:
+            data.append(
+                f'{ingredient["name"]} - '
+                f'{ingredient["amount"]} '
+                f'{ingredient["metric"]}'
+            )
+
+        return data
 
     def __str__(self):
         return f'{self.ingredient.name} в рецепте {self.recipe.name}'

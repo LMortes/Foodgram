@@ -4,7 +4,7 @@ from .constants import CHOISES_LIST
 from recipes.models import Ingredient, Recipe, Tag, Favorite, ShoppingCart
 
 
-class IngrFilter(rest_framework.FilterSet):
+class IngredientFilter(rest_framework.FilterSet):
     name = rest_framework.CharFilter(lookup_expr='startswith')
 
     class Meta:
