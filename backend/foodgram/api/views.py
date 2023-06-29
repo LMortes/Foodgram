@@ -9,7 +9,7 @@ from djoser.serializers import SetPasswordSerializer
 from users.models import User, Subscription
 from recipes.models import (Tag, Recipe, Favorite,
                             ShoppingCart,
-                            Ingredient)
+                            Ingredient, IngredientInRecipe)
 from .serializers import (IngredientSerializer, TagSerializer,
                           RecipeGetSerializer, FavoriteSerializer,
                           RecipeCreateSerializer, RecipeMiniSerializer,
@@ -173,7 +173,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated]
     )
     def download_shopping_cart(self, request):
-        data = get_info_ingredient_in_recipe(request.user)
+        data = IngredientInRecipe.get_info_ingredient_in_recipe(request.user)
         content = 'Список покупок:\n\n' + '\n'.join(data)
         filename = 'Shopping_cart.txt'
         request = HttpResponse(content, content_type='text/plain')
