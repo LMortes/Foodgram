@@ -14,11 +14,11 @@ class IngredientFilter(rest_framework.FilterSet):
 
 class RecipeFilter(rest_framework.FilterSet):
     is_favorited = rest_framework.ChoiceFilter(
-        choises=CHOISES_LIST,
+        choices=CHOISES_LIST,
         method='is_favorited_method'
     )
     is_in_shopping_cart = rest_framework.ChoiceFilter(
-        choises=CHOISES_LIST,
+        choices=CHOISES_LIST,
         method='is_in_shopping_cart_method'
     )
     author = rest_framework.NumberFilter(
