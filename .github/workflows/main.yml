@@ -86,4 +86,7 @@ jobs:
             sudo bash -c 'echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env'
             cd infra/
             sudo docker compose up -d
-
+            sudo docker compose exec backend python manage.py migrate
+            sudo docker compose exec backend python manage.py collectstatic --no-input
+            sudo docker compose exec backend python manage.py load_ingredients_data
+            sudo docker compose exec backend python manage.py load_tags_data
