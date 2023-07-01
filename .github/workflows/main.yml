@@ -72,8 +72,8 @@ jobs:
             sudo docker pull lpollot/frontend_foodgram:latest
             cd foodgram-project-react/
             cd infra/
-            sudo docker-compose stop
-            sudo docker-compose rm -f backend
+            sudo docker compose stop
+            sudo docker compose rm -f backend
             cd ..
             sudo rm .env
             sudo touch .env
@@ -84,5 +84,5 @@ jobs:
             sudo bash -c 'echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env'
             sudo bash -c 'echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env'
             cd infra/
-            sudo docker-compose up -d
+            sudo docker compose up -d
 
