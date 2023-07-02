@@ -260,7 +260,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                     'error': 'В рецепте ингридиенты не могут повторяться'
                 }
             )
-	return data
+        return data
 
     def validate_tags(self, data):
         tags = data['tags']
@@ -277,7 +277,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                     'error': 'Тэги не могут повторяться!'
                 }
             )
-	return data
+        return data
 
     def validate(self, data):
         self.validate_ingredients(data)
