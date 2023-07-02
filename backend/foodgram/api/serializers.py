@@ -263,7 +263,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return data
 
     def validate_tags(self, data):
-        tags = data['tags']
+        tags = data.get('tags')
         if not tags:
             raise serializers.ValidationError(
                 {
