@@ -251,7 +251,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def validate_ingredients(self, data):
         ingredients_list = []
-        ingredients_in_recipe = data.get('IngredientsInRecipe')
+        ingredients_in_recipe = data['IngredientsInRecipe']
         for ingredient in ingredients_in_recipe:
             ingredients_list.append(ingredient['ingredient']['id'])
         if len(ingredients_list) > len(set(ingredients_list)):
