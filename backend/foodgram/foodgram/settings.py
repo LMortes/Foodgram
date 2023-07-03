@@ -112,20 +112,10 @@ REST_FRAMEWORK = {
     'NON_FIELD_ERRORS_KEY': 'errors',
 }
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'OPTIONS': {
-            'CULL_FREQUENCY': 2,
-            'MAX_ENTRIES': 300,
-            'KEY_PREFIX': 'foodgram',
-            'CSRF_TRUSTED_ORIGINS': ['http:taskipollot2.ddns.net'],
-        }
-    }
-}
-
 DJOSER = {
     'HIDE_USERS': False,
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CSRF_TRUSTED_ORIGINS = ['http://62.84.122.31', 'http://taskipollot2.ddns.net']
