@@ -249,40 +249,23 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             )
         IngredientInRecipe.objects.bulk_create(ingredients_list)
 
-    def validate_ingredients(self, data):
+    def validate(self, data):
         ingredients_list = []
-        ingredients_in_recipe = data
+        ingredients_in_recipe = data.get('IngredientsInRecipe')
         for ingredient in ingredients_in_recipe:
+            if ingredient.get('amount') <= 0:
+                raise serializers.ValidationError(
+                    {
+                        'error': 'Ингредиентов не должно быть менее одного.'
+                    }
+                )
             ingredients_list.append(ingredient['ingredient']['id'])
         if len(ingredients_list) > len(set(ingredients_list)):
             raise serializers.ValidationError(
                 {
-                    'error': 'В рецепте ингридиенты не могут повторяться'
+                    'error': 'Ингредиенты в рецепте не должны повторяться.'
                 }
             )
-        return data
-
-    def validate_tags(self, data):
-        tags = data
-        if not tags:
-            raise serializers.ValidationError(
-                {
-                    'error': 'Нужен хотя бы один тэг для рецепта!'
-                }
-            )
-        tag_names = [tag.name for tag in tags]
-        if len(tag_names) != len(set(tag_names)):
-            raise serializers.ValidationError(
-                {
-                    'error': 'Тэги не могут повторяться!'
-                }
-            )
-        return data
-
-    def validate(self, data):
-        self.validate_ingredients(data)
-        self.validate_tags(data)
-
         return data
 
     def create(self, validated_data):
