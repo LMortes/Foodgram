@@ -112,6 +112,8 @@ REST_FRAMEWORK = {
     'NON_FIELD_ERRORS_KEY': 'errors',
 }
 
+'CSRF_TRUSTED_ORIGINS': ['http://62.84.122.31.ddns.net', 'http://taskipollot2.ddns.net']
+
 DJOSER = {
     'HIDE_USERS': False,
 }
