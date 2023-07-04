@@ -17,7 +17,7 @@ class Command(BaseCommand):
         ):
             ingredient = Ingredient(
                 name=row['name'],
-                metric=row['m_unit']
+                measurement_unit=row['m_unit']
             )
             ingredient.save()
             count += 1
