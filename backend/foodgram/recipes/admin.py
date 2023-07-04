@@ -52,7 +52,7 @@ class IngrAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
         'name',
-        'metric'
+        'measurement_unit'
     )
 
 

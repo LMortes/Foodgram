@@ -122,7 +122,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = ('id', 'name', 'metric')
+        fields = ('id', 'name', 'measurement_unit')
 
 
 class IngredientInRecipeSerializer(serializers.ModelSerializer):
@@ -134,14 +134,14 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
         source='ingredient.name',
         read_only=True
     )
-    metric = serializers.CharField(
-        source='ingredient.metric',
+    measurement_unit = serializers.CharField(
+        source='ingredient.measurement_unit',
         read_only=True
     )
 
     class Meta:
         model = IngredientInRecipe
-        fields = ('id', 'name', 'metric', 'amount')
+        fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
 class TagSerializer(serializers.ModelSerializer):

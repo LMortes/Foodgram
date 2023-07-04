@@ -9,7 +9,7 @@ class Ingredient(models.Model):
         'Имя ингридиента',
         max_length=100
     )
-    metric = models.CharField(
+    measurement_unit = models.CharField(
         'Единица измерения ингридиента',
         max_length=30
     )
@@ -19,7 +19,7 @@ class Ingredient(models.Model):
         verbose_name_plural = 'ингредиенты'
 
     def __str__(self):
-        return f'{self.name} в {self.metric}'
+        return f'{self.name} в {self.measurement_unit}'
 
 
 class Tag(models.Model):
@@ -126,7 +126,7 @@ class IngredientInRecipe(models.Model):
         ingredients = IngredientInRecipe.objects.filter(
             recipe__shopping_cart__user=user).values(
             name=F('ingredient__name'),
-            metric=F('ingredient__metric')).annotate(
+            measurement_unit=F('ingredient__measurement_unit')).annotate(
             amount=Sum('amount')
         )
         data = []
@@ -134,7 +134,7 @@ class IngredientInRecipe(models.Model):
             data.append(
                 f'{ingredient["name"]} - '
                 f'{ingredient["amount"]} '
-                f'{ingredient["metric"]}'
+                f'{ingredient["measurement_unit"]}'
             )
 
         return data
